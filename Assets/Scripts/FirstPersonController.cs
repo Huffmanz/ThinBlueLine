@@ -19,12 +19,16 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private bool canCrouch = true;
     [SerializeField] private bool enableHeadbob = true;
     [SerializeField] private bool slideOnSlopes = true;
+    [SerializeField] private bool canLean = true;
 
     [Header("Controls")]
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
     [SerializeField] private MouseButton aimKey = MouseButton.Right;
+    [SerializeField] private KeyCode leanLeft = KeyCode.Q;
+    [SerializeField] private KeyCode leanRight = KeyCode.E;
+
 
     [Header("Movement Parameters")]
     [SerializeField] private float walkSpeed = 3.0f;
@@ -55,6 +59,21 @@ public class FirstPersonController : MonoBehaviour
     private bool isCrouching;
     private bool duringCrouchAnimation;
 
+    [Header("Leaning")]
+    [SerializeField] private Transform leanPivot;
+    [SerializeField] private float leanDegrees;
+    [SerializeField] private float leanSmoothing;
+    [SerializeField] private float leanDistance;
+
+    private Vector3 leanPivotStartingLocalPos;
+    private Vector3 targetLeanPivotPos;
+    private Vector3 currentLeanPivotPos;
+    private Vector3 leanPivotVelocity;
+    private float leanVelocity;
+    private float targetLean;
+    private float currentLean;
+    private bool isLeaning = false;
+
     [Header("Headbob Parameters")]
     [SerializeField] private float walkBobSpeed = 14.0f;
     [SerializeField] private float walkBobAmount = 0.05f;
@@ -69,6 +88,9 @@ public class FirstPersonController : MonoBehaviour
     private Animator animator;
     private int speedString = Animator.StringToHash("Speed");
     private int shootString = Animator.StringToHash("Shoot");
+    private int reloadString = Animator.StringToHash("Reload");
+    private int dryFireString = Animator.StringToHash("DryFire");
+
 
     private float defaultYPos = 0;
     private float headBobTimer;
@@ -112,6 +134,9 @@ public class FirstPersonController : MonoBehaviour
     private void Start()
     {
         weaponController.WeaponFiredEvent += HandleShooting;
+        weaponController.WeaponDryFireEvent += HandleDryFire;
+        weaponController.WeaponReloadEvent += HandleReload;
+        leanPivotStartingLocalPos = leanPivot.localPosition;
     }
 
     private void Update()
@@ -121,6 +146,7 @@ public class FirstPersonController : MonoBehaviour
         HandleMouseLook();
         HandleJump();
         HandleCrouch();
+        HandleLean();
         HandleHeadbob();
         HandleAiming();
         ApplyFinalMovements();
@@ -207,6 +233,51 @@ public class FirstPersonController : MonoBehaviour
         duringCrouchAnimation = false;
     }
 
+    private void HandleLean()
+    {
+        if (!canLean) return;
+
+        if (Input.GetKeyDown(leanLeft))
+        {
+            targetLean = isLeaning ? 0 : leanDegrees;
+            isLeaning = !isLeaning;
+            if (isLeaning)
+            {
+                targetLeanPivotPos = leanPivotStartingLocalPos;
+                targetLeanPivotPos.x -= leanDistance;
+            }
+            else
+            {
+                targetLeanPivotPos = leanPivotStartingLocalPos;
+            }
+        }
+        else if (Input.GetKeyDown(leanRight))
+        {
+            targetLean = isLeaning ? 0 : -leanDegrees;
+            isLeaning = !isLeaning;
+            if (isLeaning)
+            {
+                targetLeanPivotPos = leanPivotStartingLocalPos;
+                targetLeanPivotPos.x += leanDistance;
+            }
+            else
+            {
+                targetLeanPivotPos = leanPivotStartingLocalPos;
+            }
+        }
+
+        if (IsSprinting)
+        {
+            targetLean = 0;
+        }
+
+        currentLean = Mathf.SmoothDamp(currentLean, targetLean, ref leanVelocity, leanSmoothing);
+        leanPivot.localRotation = Quaternion.Euler(new Vector3(0, 0, currentLean));
+        currentLeanPivotPos = Vector3.SmoothDamp(currentLeanPivotPos, targetLeanPivotPos, ref leanPivotVelocity, leanSmoothing);
+        leanPivot.localPosition = currentLeanPivotPos;
+    }
+
+
     private void HandleHeadbob()
     {
         if (!enableHeadbob) return;
@@ -265,5 +336,15 @@ public class FirstPersonController : MonoBehaviour
     private void HandleShooting()
     {
         animator.SetTrigger(shootString);
+    }
+
+    private void HandleDryFire()
+    {
+        animator.SetTrigger(dryFireString);
+    }
+
+    private void HandleReload()
+    {
+        animator.SetTrigger(reloadString);
     }
 }

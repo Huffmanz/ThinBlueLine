@@ -676,6 +676,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2045535672}
   m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+--- !u!1 &245898865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 245898866}
+  m_Layer: 0
+  m_Name: LeanPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &245898866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245898865}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1823688467}
+  m_Father: {fileID: 1431570167}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &297689802
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -717,7 +749,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 19e02f724e08b38478bdc06839e53823,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.096
+      value: -0.085
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19e02f724e08b38478bdc06839e53823,
         type: 3}
@@ -727,7 +759,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 19e02f724e08b38478bdc06839e53823,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.321
+      value: 0.277
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19e02f724e08b38478bdc06839e53823,
         type: 3}
@@ -3302,10 +3334,13 @@ MonoBehaviour:
   canCrouch: 1
   enableHeadbob: 1
   slideOnSlopes: 1
+  canLean: 1
   sprintKey: 304
   jumpKey: 32
   crouchKey: 306
   aimKey: 1
+  leanLeft: 113
+  leanRight: 101
   walkSpeed: 3
   sprintSpeed: 6
   slopeSpeed: 8
@@ -3321,6 +3356,10 @@ MonoBehaviour:
   timeToCrouch: 0.25
   crouchingCenter: {x: 0, y: 0.5, z: 0}
   standingCenter: {x: 0, y: 0, z: 0}
+  leanPivot: {fileID: 245898866}
+  leanDegrees: 30
+  leanSmoothing: 0.3
+  leanDistance: 1
   walkBobSpeed: 14
   walkBobAmount: 0.05
   sprintBobSpeed: 18
@@ -3367,7 +3406,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1823688467}
+  - {fileID: 245898866}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1462894305
@@ -3758,12 +3797,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a7f22d4741101a4db18fa66203791ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shootingDelay: 2
+  shootingDelay: 0.75
   shootingMode: 0
   bulletsPerBurst: 0
   spread: 0.25
   muzzleFlash: {fileID: 8034129003017203231, guid: 8530033dbbe8e314fb69e861a4268407,
     type: 3}
+  reloadTime: 3
+  magazineSize: 10
+  numMagazine: 2
   bulletPrefab: {fileID: 5313017216890462864, guid: 0c1063bab8cea6743911073319b94297,
     type: 3}
   bulletSpawn: {fileID: 1571288400}
@@ -4307,12 +4349,12 @@ Transform:
   m_GameObject: {fileID: 1823688464}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.347, z: 0}
+  m_LocalPosition: {x: 0, y: -0.25300002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1598665285}
-  m_Father: {fileID: 1431570167}
+  m_Father: {fileID: 245898866}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1823688468
 MonoBehaviour:

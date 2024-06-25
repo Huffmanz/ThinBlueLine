@@ -13,6 +13,8 @@ public enum ShootingMode
 public class WeaponController : MonoBehaviour
 {
     public event Action WeaponFiredEvent;
+    public event Action WeaponDryFireEvent;
+    public event Action WeaponReloadEvent;
 
     [Header("Gun Properties")]
     [SerializeField] private float shootingDelay = 2f;
@@ -20,8 +22,14 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private int bulletsPerBurst;
     [SerializeField] private float spread;
     [SerializeField] private GameObject muzzleFlash;
+    [SerializeField] private float reloadTime;
+    [SerializeField] private int magazineSize = 10;
+    [SerializeField] private int numMagazine = 2;
+
 
     private int burstBulletsLeft;
+    private int currentAmmo;
+    private int currentMagazines;
 
 
     [Header("Bullet")]
@@ -38,6 +46,8 @@ public class WeaponController : MonoBehaviour
     public bool IsAiming { get; set; }
     public bool isShooting { get; private set; }
     public bool readyToShoot { get; private set; }
+    private bool isReloading = false;
+    private float reloadTimer;
     bool allowReset = true;
 
 
@@ -51,6 +61,8 @@ public class WeaponController : MonoBehaviour
         readyToShoot = true;
         burstBulletsLeft = bulletsPerBurst;
         originalPosition = transform.localPosition;
+        currentAmmo = magazineSize;
+        currentMagazines = numMagazine;
     }
 
     private void Start()
@@ -74,6 +86,25 @@ public class WeaponController : MonoBehaviour
             burstBulletsLeft = bulletsPerBurst;
             FireWeapon();
         }
+        HandleReload();
+    }
+
+    private void HandleReload()
+    {
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentMagazines > 0)
+        {
+            currentMagazines--;
+            currentAmmo = magazineSize;
+            isReloading = true;
+            reloadTimer = 0;
+            WeaponReloadEvent?.Invoke();
+            Debug.Log($"Reloading... Current Ammo = {currentAmmo} Current Magazines = {currentMagazines} ");
+        }
+        if (isReloading)
+        {
+            isReloading = reloadTimer < reloadTime;
+            reloadTimer += Time.deltaTime;
+        }
     }
 
     private void AimDownSights()
@@ -91,6 +122,14 @@ public class WeaponController : MonoBehaviour
 
     public void FireWeapon()
     {
+        if (isReloading) return;
+        if (currentAmmo == 0)
+        {
+            WeaponDryFireEvent?.Invoke();
+            return;
+        }
+        currentAmmo -= 1;
+        Debug.Log($"Fired {currentAmmo} left");
         readyToShoot = false;
         WeaponFiredEvent?.Invoke();
         Vector3 shootingDirection = CalculateDirectionAndSpready().normalized;
@@ -110,8 +149,9 @@ public class WeaponController : MonoBehaviour
             burstBulletsLeft--;
             FireWeapon();
         }
-
     }
+
+
 
     private Vector3 CalculateDirectionAndSpready()
     {
