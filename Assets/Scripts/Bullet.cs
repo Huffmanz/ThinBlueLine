@@ -9,7 +9,6 @@ public class Bullet : MonoBehaviour
     {
         if (hitObject.gameObject.CompareTag("Target"))
         {
-            print($"hit {hitObject.gameObject.name}!");
             CreateBulletImpactEffect(hitObject);
             Destroy(gameObject);
         }
@@ -17,6 +16,22 @@ public class Bullet : MonoBehaviour
         {
             CreateBulletImpactEffect(hitObject);
             Destroy(gameObject);
+        }
+        if (hitObject.gameObject.TryGetComponent<Hitbox>(out Hitbox hitBox))
+        {
+            Debug.Log("hit parent");
+            hitBox.Hit(transform.forward);
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log("hit child");
+            Hitbox hitbox = hitObject.gameObject.GetComponentInChildren<Hitbox>();
+            if (hitbox != null)
+            {
+                hitbox.Hit(transform.forward);
+                Destroy(gameObject);
+            }
         }
     }
 

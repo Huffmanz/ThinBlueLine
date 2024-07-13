@@ -26,11 +26,9 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private int magazineSize = 10;
     [SerializeField] private int numMagazine = 2;
 
-
     private int burstBulletsLeft;
     private int currentAmmo;
     private int currentMagazines;
-
 
     [Header("Bullet")]
     [SerializeField] private GameObject bulletPrefab;
@@ -98,7 +96,6 @@ public class WeaponController : MonoBehaviour
             isReloading = true;
             reloadTimer = 0;
             WeaponReloadEvent?.Invoke();
-            Debug.Log($"Reloading... Current Ammo = {currentAmmo} Current Magazines = {currentMagazines} ");
         }
         if (isReloading)
         {
@@ -129,10 +126,9 @@ public class WeaponController : MonoBehaviour
             return;
         }
         currentAmmo -= 1;
-        Debug.Log($"Fired {currentAmmo} left");
         readyToShoot = false;
         WeaponFiredEvent?.Invoke();
-        Vector3 shootingDirection = CalculateDirectionAndSpready().normalized;
+        Vector3 shootingDirection = CalculateDirectionAndSpread().normalized;
         GameObject muzzleFlashInst = Instantiate(muzzleFlash, bulletSpawn.position, Quaternion.identity);
         muzzleFlashInst.transform.forward = shootingDirection;
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, Quaternion.identity);
@@ -153,7 +149,7 @@ public class WeaponController : MonoBehaviour
 
 
 
-    private Vector3 CalculateDirectionAndSpready()
+    private Vector3 CalculateDirectionAndSpread()
     {
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(.5f, .5f, 0));
         RaycastHit hit;
